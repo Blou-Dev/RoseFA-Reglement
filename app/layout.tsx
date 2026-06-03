@@ -4,10 +4,10 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: {
-    default: "RoseFA Docs",
-    template: "%s | RoseFA Docs",
+    default: "RoseFA",
+    template: "%s | RoseFA",
   },
-  description: "Documentation moderne du serveur FiveM RoseFA.",
+  description: "Reglement, guides et informations officielles du serveur FiveM RoseFA.",
 };
 
 export default function RootLayout({
