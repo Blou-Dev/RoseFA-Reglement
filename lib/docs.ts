@@ -84,6 +84,50 @@ const DEFAULT_HOMEPAGE: HomePageContentData = {
   ],
 };
 
+const SAFE_LEXIQUE_BODY = `## Comprendre le vocabulaire du serveur
+
+Avant de participer a des scenes importantes, il est essentiel de connaitre les expressions les plus courantes du roleplay RoseFA.
+
+<Alert title="Pourquoi ce lexique ?" variant="info">
+Il permet d'eviter les ruptures d'immersion tout en gardant une communication claire lorsque la technique ou le contexte l'impose.
+</Alert>
+
+<Accordion
+  items={[
+    { title: "Mal de tete", content: "Expression utilisee pour signaler un souci technique, un freeze ou un ralentissement qui perturbe une scene." },
+    { title: "Robespierre", content: "Mot code utilise pour parler d'un administrateur ou d'une intervention staff sans sortir du roleplay." },
+    { title: "Unite X", content: "Designe une personne ou une information que l'on ne souhaite pas nommer precisement dans l'instant." },
+    { title: "Tempete", content: "Annonce roleplay d'un redemarrage ou d'une relance du serveur." },
+    { title: "Papillon", content: "Joueur qui tourne autour d'une scene, observe ou reste en flottement sans se positionner clairement." },
+    { title: "Avoir un chewing-gum", content: "Designe un probleme de micro ou de voix robotisee pendant une interaction vocale." },
+    { title: "Prendre une pastille", content: "Signifie qu'un joueur doit changer de canal vocal ou corriger un souci audio." },
+    { title: "GoPro / DashCam / Lunette violette", content: "Indique qu'une scene est potentiellement captee ou exploitable selon les regles en vigueur du serveur." },
+    { title: "Faire une sieste", content: "Annonce une deco/reco rapide pour resoudre un bug ou une desynchronisation." },
+    { title: "Aller dormir", content: "Annonce une deconnexion plus longue ou une fin de session." },
+    { title: "Parler chinois", content: "Utilise quand un message est incomprehensible, coupe ou inaudible." },
+  ]}
+/>`;
+
+function normalizePublicBody({
+  categorySlug,
+  pageSlug,
+  body,
+}: {
+  categorySlug: string;
+  pageSlug: string;
+  body: string;
+}) {
+  if (
+    categorySlug === "reglement-rosefa" &&
+    pageSlug === "lexique" &&
+    (body.includes("Powergaming") || body.includes("Metagaming") || body.includes("Avant de participer Ã"))
+  ) {
+    return SAFE_LEXIQUE_BODY;
+  }
+
+  return body;
+}
+
 function mapHomePageContent(
   homepage: (HomePageContent & { links: HomePageLink[] }) | null,
 ): HomePageContentData {
@@ -154,8 +198,15 @@ export const getPublicPageBySlug = cache(async (slug: string[]): Promise<PublicP
 
   if (!page) return null;
 
+  const normalizedBody = normalizePublicBody({
+    categorySlug: page.category.slug,
+    pageSlug: page.slug,
+    body: page.body,
+  });
+
   return {
     ...page,
+    body: normalizedBody,
     href: `/docs/${page.category.slug}/${page.slug}`,
   };
 });
@@ -192,7 +243,14 @@ export const getSearchIndex = cache(async (): Promise<SearchItem[]> => {
     description: page.description,
     href: `/docs/${page.category.slug}/${page.slug}`,
     section: page.category.title,
-    content: page.body.replace(/[#>*`-]/g, " ").replace(/\s+/g, " ").trim(),
+    content: normalizePublicBody({
+      categorySlug: page.category.slug,
+      pageSlug: page.slug,
+      body: page.body,
+    })
+      .replace(/[#>*`-]/g, " ")
+      .replace(/\s+/g, " ")
+      .trim(),
   }));
 });
 
