@@ -9,11 +9,26 @@ export type AccordionItemType = {
   content: string;
 };
 
-export function Accordion({ items }: { items: AccordionItemType[] }) {
+function isAccordionItem(value: unknown): value is AccordionItemType {
+  return Boolean(
+    value &&
+      typeof value === "object" &&
+      typeof (value as AccordionItemType).title === "string" &&
+      typeof (value as AccordionItemType).content === "string",
+  );
+}
+
+export function Accordion({ items }: { items?: AccordionItemType[] }) {
+  const safeItems = Array.isArray(items) ? items.filter(isAccordionItem) : [];
+
+  if (safeItems.length === 0) {
+    return null;
+  }
+
   return (
     <div className="overflow-hidden rounded-[1.8rem] border border-white/10 bg-white/[0.03]">
-      {items.map((item, index) => (
-        <AccordionItem key={item.title} item={item} last={index === items.length - 1} />
+      {safeItems.map((item, index) => (
+        <AccordionItem key={item.title} item={item} last={index === safeItems.length - 1} />
       ))}
     </div>
   );
