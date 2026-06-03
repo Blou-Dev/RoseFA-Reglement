@@ -120,7 +120,10 @@ function normalizePublicBody({
   if (
     categorySlug === "reglement-rosefa" &&
     pageSlug === "lexique" &&
-    (body.includes("Powergaming") || body.includes("Metagaming") || body.includes("Avant de participer Ã"))
+    (body.includes("Avant de participer Ã") ||
+      body.includes("rÃ©aliser des actions irrÃ©alistes") ||
+      body.includes("diffÃ©rentes notions RP utilisÃ©es") ||
+      body.includes("scÃ¨nes cohÃ©rentes, immersives et agrÃ©ables"))
   ) {
     return SAFE_LEXIQUE_BODY;
   }
