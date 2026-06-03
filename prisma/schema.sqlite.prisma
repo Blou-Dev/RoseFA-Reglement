@@ -3,9 +3,8 @@ generator client {
 }
 
 datasource db {
-  provider  = "postgresql"
-  url       = env("DATABASE_URL")
-  directUrl = env("POSTGRES_URL_NON_POOLING")
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
 }
 
 enum PageStatus {
@@ -70,7 +69,7 @@ model CategoryEditSession {
 }
 
 model HomePageContent {
-  id                 String         @id
+  id                 String             @id
   heroTitle          String
   heroSubtitle       String
   introTitle         String
@@ -78,8 +77,8 @@ model HomePageContent {
   introBodySecondary String?
   warningText        String
   banner             String?
-  createdAt          DateTime       @default(now())
-  updatedAt          DateTime       @updatedAt
+  createdAt          DateTime           @default(now())
+  updatedAt          DateTime           @updatedAt
   links              HomePageLink[]
 }
 
