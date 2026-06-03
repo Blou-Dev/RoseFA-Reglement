@@ -1,0 +1,112 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/postgres-client"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("POSTGRES_DATABASE_URL")
+  directUrl = env("POSTGRES_DIRECT_URL")
+}
+
+enum PageStatus {
+  DRAFT
+  PUBLISHED
+}
+
+enum HomePageSectionType {
+  START
+  REGULATION
+}
+
+enum AdminUserRole {
+  WRITER
+}
+
+model Category {
+  id          String   @id @default(cuid())
+  title       String
+  slug        String   @unique
+  description String?
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  pages       Page[]
+  editSession CategoryEditSession?
+}
+
+model Page {
+  id          String     @id @default(cuid())
+  categoryId  String
+  category    Category   @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  title       String
+  slug        String
+  description String
+  excerpt     String?
+  body        String
+  banner      String?
+  order       Int        @default(0)
+  status      PageStatus @default(DRAFT)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  @@unique([categoryId, slug])
+}
+
+model CategoryEditSession {
+  id                String   @id @default(cuid())
+  categoryId        String   @unique
+  category          Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  pageId            String?
+  pageTitle         String?
+  editorEmail       String
+  editorName        String?
+  editorKey         String
+  hasUnsavedChanges Boolean  @default(false)
+  expiresAt         DateTime
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  @@index([expiresAt])
+}
+
+model HomePageContent {
+  id                 String         @id
+  heroTitle          String
+  heroSubtitle       String
+  introTitle         String
+  introBody          String
+  introBodySecondary String?
+  warningText        String
+  banner             String?
+  createdAt          DateTime       @default(now())
+  updatedAt          DateTime       @updatedAt
+  links              HomePageLink[]
+}
+
+model HomePageLink {
+  id          String              @id @default(cuid())
+  homepageId  String
+  homepage    HomePageContent     @relation(fields: [homepageId], references: [id], onDelete: Cascade)
+  section     HomePageSectionType
+  title       String
+  description String
+  href        String
+  icon        String
+  order       Int                 @default(0)
+  createdAt   DateTime            @default(now())
+  updatedAt   DateTime            @updatedAt
+
+  @@index([homepageId, section, order])
+}
+
+model AdminUser {
+  id           String        @id @default(cuid())
+  email        String        @unique
+  name         String
+  passwordHash String
+  role         AdminUserRole @default(WRITER)
+  isActive     Boolean       @default(true)
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+}

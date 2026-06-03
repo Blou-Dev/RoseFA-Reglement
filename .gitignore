@@ -11,3 +11,4 @@ prisma/prisma/dev.db
 prisma/prisma/dev.db-journal
 *.log
 backups
+generated
