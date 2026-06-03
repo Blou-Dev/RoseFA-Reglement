@@ -1,6 +1,11 @@
 import { withAuth } from "next-auth/middleware";
 import { NextResponse } from "next/server";
-import { isAdminRole, OWNER_ROLE } from "@/lib/auth-shared";
+
+const OWNER_ROLE = "owner";
+
+function isAdminRole(role?: string | null) {
+  return role === OWNER_ROLE || role === "writer";
+}
 
 export default withAuth(
   function middleware(request) {
