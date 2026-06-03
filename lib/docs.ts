@@ -91,10 +91,12 @@ function mapHomePageContent(
     return DEFAULT_HOMEPAGE;
   }
 
-  const startLinks = homepage.links
+  const homepageLinks = homepage.links ?? [];
+
+  const startLinks = homepageLinks
     .filter((link) => link.section === HomePageSectionType.START)
     .sort((left, right) => left.order - right.order);
-  const regulationLinks = homepage.links
+  const regulationLinks = homepageLinks
     .filter((link) => link.section === HomePageSectionType.REGULATION)
     .sort((left, right) => left.order - right.order);
 

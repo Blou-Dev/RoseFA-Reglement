@@ -110,9 +110,11 @@ function SectionHeader({ title, description }: { title: string; description: str
 }
 
 function LinkList({ items }: { items: HomePageLinkItem[] }) {
+  const safeItems = items ?? [];
+
   return (
     <div className="border-t border-white/10">
-      {items.map((item) => (
+      {safeItems.map((item) => (
         <LinkRow key={`${item.section}-${item.id}-${item.href}`} item={item} />
       ))}
     </div>

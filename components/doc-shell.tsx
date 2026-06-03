@@ -11,11 +11,13 @@ export function DocShell({
   children: ReactNode;
   categories: PublicCategory[];
 }) {
+  const safeCategories = categories ?? [];
+
   return (
     <div className="min-h-screen">
-      <Topbar categories={categories} />
+      <Topbar categories={safeCategories} />
       <div className="mx-auto flex max-w-[var(--page-max-width)] xl:px-4">
-        <Sidebar categories={categories} />
+        <Sidebar categories={safeCategories} />
         <main className="min-w-0 flex-1">
           <div className="mx-auto max-w-[1040px] px-4 py-6 md:px-6 md:py-7 xl:px-8">{children}</div>
           <div className="mx-auto max-w-[1040px] px-4 pb-10 md:px-6 xl:px-8">

@@ -9,10 +9,11 @@ type SummaryLink = {
 };
 
 export function SectionSummary({ links }: { links: SummaryLink[] }) {
-  const [activeId, setActiveId] = useState(links[0]?.href ?? "");
+  const safeLinks = links ?? [];
+  const [activeId, setActiveId] = useState(safeLinks[0]?.href ?? "");
 
   useEffect(() => {
-    const sections = links
+    const sections = safeLinks
       .map((link) => document.querySelector(link.href))
       .filter((element): element is HTMLElement => element instanceof HTMLElement);
 
@@ -40,11 +41,11 @@ export function SectionSummary({ links }: { links: SummaryLink[] }) {
       sections.forEach((section) => observer.unobserve(section));
       observer.disconnect();
     };
-  }, [links]);
+  }, [safeLinks]);
 
   return (
     <nav className="mt-4 space-y-1">
-      {links.map((item) => {
+      {safeLinks.map((item) => {
         const active = activeId === item.href;
 
         return (

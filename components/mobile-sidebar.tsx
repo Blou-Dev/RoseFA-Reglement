@@ -7,6 +7,7 @@ import type { PublicCategory } from "@/lib/types";
 
 export function MobileSidebar({ categories }: { categories: PublicCategory[] }) {
   const [open, setOpen] = useState(false);
+  const safeCategories = categories ?? [];
 
   return (
     <>
@@ -45,11 +46,11 @@ export function MobileSidebar({ categories }: { categories: PublicCategory[] }) 
                 </Link>
               </div>
 
-              {categories.map((group) => (
+              {safeCategories.map((group) => (
                 <div key={group.title} className="space-y-2">
                   <div className="px-1 text-xs font-semibold uppercase tracking-[0.22em] text-white/45">{group.title}</div>
 
-                  {group.pages.map((item) => (
+                  {(group.pages ?? []).map((item) => (
                     <Link
                       key={item.id}
                       href={item.href}

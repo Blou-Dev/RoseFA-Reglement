@@ -9,6 +9,7 @@ import { cn } from "@/lib/utils";
 
 export function Sidebar({ categories }: { categories: PublicCategory[] }) {
   const pathname = usePathname();
+  const safeCategories = categories ?? [];
 
   return (
     <aside className="hidden w-[var(--sidebar-width)] shrink-0 xl:block">
@@ -25,12 +26,12 @@ export function Sidebar({ categories }: { categories: PublicCategory[] }) {
               />
             </div>
 
-            {categories.map((group) => (
+            {safeCategories.map((group) => (
               <div key={group.title} className="space-y-2">
                 <div className="px-3 pt-2 text-[11px] font-semibold uppercase tracking-[0.24em] text-white/38">{group.title}</div>
 
                 <div className="space-y-0.5">
-                  {group.pages.map((item) => (
+                  {(group.pages ?? []).map((item) => (
                     <SidebarLink key={item.id} href={item.href} title={item.title} active={pathname === item.href} />
                   ))}
                 </div>
