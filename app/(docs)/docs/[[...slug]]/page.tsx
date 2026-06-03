@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { compileMDX } from "next-mdx-remote/rsc";
+import remarkBreaks from "remark-breaks";
 import remarkGfm from "remark-gfm";
 import { Banner } from "@/components/banner";
 import { mdxComponents } from "@/components/mdx/mdx-components";
@@ -45,7 +46,7 @@ export default async function DocPage({
     options: {
       parseFrontmatter: false,
       mdxOptions: {
-        remarkPlugins: [remarkGfm],
+        remarkPlugins: [remarkGfm, remarkBreaks],
       },
     },
   });

@@ -4,23 +4,20 @@ import type { ReactNode } from "react";
 import { useEffect, useRef } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
 
-function clearHighlights(root: HTMLElement) {
-  const highlights = root.querySelectorAll("mark[data-search-highlight='true']");
-
-  highlights.forEach((highlight) => {
-    const parent = highlight.parentNode;
-    if (!parent) return;
-
-    parent.replaceChild(document.createTextNode(highlight.textContent ?? ""), highlight);
-    parent.normalize();
-  });
-}
-
 function escapeRegExp(value: string) {
   return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
-function highlightQuery(root: HTMLElement, query: string): HTMLElement | null {
+function clearCustomHighlights() {
+  if (typeof CSS === "undefined" || !("highlights" in CSS)) {
+    return;
+  }
+
+  CSS.highlights.delete("search-match");
+  CSS.highlights.delete("search-current");
+}
+
+function highlightQuery(root: HTMLElement, query: string): Range | null {
   const normalizedQuery = query.trim();
   if (!normalizedQuery) return null;
 
@@ -47,43 +44,43 @@ function highlightQuery(root: HTMLElement, query: string): HTMLElement | null {
     currentNode = walker.nextNode();
   }
 
-  let firstHighlight: HTMLElement | null = null;
+  const ranges: Range[] = [];
+  let firstRange: Range | null = null;
 
   textNodes.forEach((textNode) => {
     const text = textNode.textContent ?? "";
-    if (!regex.test(text)) return;
     regex.lastIndex = 0;
 
-    const fragment = document.createDocumentFragment();
-    let lastIndex = 0;
+    let match: RegExpExecArray | null = regex.exec(text);
 
-    text.replace(regex, (match, offset: number) => {
-      if (offset > lastIndex) {
-        fragment.appendChild(document.createTextNode(text.slice(lastIndex, offset)));
+    while (match) {
+      const start = match.index;
+      const end = start + match[0].length;
+      const range = document.createRange();
+      range.setStart(textNode, start);
+      range.setEnd(textNode, end);
+      ranges.push(range);
+
+      if (!firstRange) {
+        firstRange = range;
       }
 
-      const mark = document.createElement("mark");
-      mark.dataset.searchHighlight = "true";
-      mark.className = "search-highlight-match";
-      mark.textContent = match;
-      fragment.appendChild(mark);
-
-      if (!firstHighlight) {
-        firstHighlight = mark;
-      }
-
-      lastIndex = offset + match.length;
-      return match;
-    });
-
-    if (lastIndex < text.length) {
-      fragment.appendChild(document.createTextNode(text.slice(lastIndex)));
+      match = regex.exec(text);
     }
-
-    textNode.parentNode?.replaceChild(fragment, textNode);
   });
 
-  return firstHighlight;
+  if (ranges.length === 0) {
+    return null;
+  }
+
+  if (typeof CSS !== "undefined" && "highlights" in CSS) {
+    CSS.highlights.set("search-match", new Highlight(...ranges));
+    if (firstRange) {
+      CSS.highlights.set("search-current", new Highlight(firstRange));
+    }
+  }
+
+  return firstRange;
 }
 
 export function SearchHighlight({ children }: { children: ReactNode }) {
@@ -96,7 +93,7 @@ export function SearchHighlight({ children }: { children: ReactNode }) {
     const root = rootRef.current;
     if (!root) return;
 
-    clearHighlights(root);
+    clearCustomHighlights();
 
     if (!query.trim()) {
       return;
@@ -109,12 +106,16 @@ export function SearchHighlight({ children }: { children: ReactNode }) {
     const attemptHighlight = () => {
       if (cancelled || !rootRef.current) return false;
 
-      clearHighlights(rootRef.current);
-      const firstHighlight = highlightQuery(rootRef.current, query);
-      if (!firstHighlight) return false;
+      clearCustomHighlights();
+      const firstRange = highlightQuery(rootRef.current, query);
+      if (!firstRange) return false;
 
-      firstHighlight.classList.add("search-highlight-current");
-      firstHighlight.scrollIntoView({
+      const firstElement =
+        firstRange.startContainer instanceof Element
+          ? firstRange.startContainer
+          : firstRange.startContainer.parentElement;
+
+      firstElement?.scrollIntoView({
         behavior: "smooth",
         block: "center",
       });
@@ -160,9 +161,7 @@ export function SearchHighlight({ children }: { children: ReactNode }) {
       if (timeoutId !== null) {
         window.clearTimeout(timeoutId);
       }
-      if (rootRef.current) {
-        clearHighlights(rootRef.current);
-      }
+      clearCustomHighlights();
     };
   }, [pathname, query]);
 

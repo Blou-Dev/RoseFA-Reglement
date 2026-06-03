@@ -760,6 +760,12 @@ export function PageForm({
                 name="body"
                 value={body}
                 onChange={(event) => setBody(event.target.value)}
+                onKeyDown={(event) => {
+                  if (event.key === "Enter" && event.shiftKey) {
+                    event.preventDefault();
+                    insertAtSelection(textareaRef, setBody, "\n\n");
+                  }
+                }}
                 rows={24}
                 className="min-h-[460px] w-full resize-y bg-[#111118] px-4 py-4 font-mono text-sm text-white outline-none"
                 required
@@ -769,7 +775,7 @@ export function PageForm({
             <div className="mt-3 text-xs leading-6 text-white/45">
               Statut edition :{" "}
               {isDirty ? (
-                <span className="text-amber-200">Règlement en cours d'edition : {currentCategoryTitle}</span>
+                <span className="text-amber-200">Reglement en cours d'edition : {currentCategoryTitle}</span>
               ) : (
                 <span>Aucune modification non sauvegardee.</span>
               )}
