@@ -4,28 +4,21 @@ import type { ReactNode } from "react";
 import { useEffect, useRef } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
 
-function escapeRegExp(value: string) {
-  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+function clearActiveTargets(root: HTMLElement) {
+  root
+    .querySelectorAll("[data-search-current='true']")
+    .forEach((element) => element.removeAttribute("data-search-current"));
 }
 
-function clearCustomHighlights() {
-  if (typeof CSS === "undefined" || !("highlights" in CSS)) {
-    return;
-  }
-
-  CSS.highlights.delete("search-match");
-  CSS.highlights.delete("search-current");
-}
-
-function highlightQuery(root: HTMLElement, query: string): Range | null {
-  const normalizedQuery = query.trim();
+function findSearchTarget(root: HTMLElement, query: string): HTMLElement | null {
+  const normalizedQuery = query.trim().toLowerCase();
   if (!normalizedQuery) return null;
 
   const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
     acceptNode(node) {
       const parent = node.parentElement;
       if (!parent) return NodeFilter.FILTER_REJECT;
-      if (["SCRIPT", "STYLE", "MARK", "TEXTAREA"].includes(parent.tagName)) {
+      if (["SCRIPT", "STYLE", "TEXTAREA"].includes(parent.tagName)) {
         return NodeFilter.FILTER_REJECT;
       }
       if (!(node.textContent ?? "").trim()) {
@@ -35,52 +28,23 @@ function highlightQuery(root: HTMLElement, query: string): Range | null {
     },
   });
 
-  const regex = new RegExp(escapeRegExp(normalizedQuery), "gi");
-  const textNodes: Text[] = [];
   let currentNode = walker.nextNode();
 
   while (currentNode) {
-    textNodes.push(currentNode as Text);
+    const text = (currentNode.textContent ?? "").toLowerCase();
+    if (text.includes(normalizedQuery)) {
+      const element =
+        currentNode.parentElement?.closest("p, li, h1, h2, h3, h4, blockquote, td, th, div");
+
+      if (element instanceof HTMLElement) {
+        return element;
+      }
+    }
+
     currentNode = walker.nextNode();
   }
 
-  const ranges: Range[] = [];
-  let firstRange: Range | null = null;
-
-  textNodes.forEach((textNode) => {
-    const text = textNode.textContent ?? "";
-    regex.lastIndex = 0;
-
-    let match: RegExpExecArray | null = regex.exec(text);
-
-    while (match) {
-      const start = match.index;
-      const end = start + match[0].length;
-      const range = document.createRange();
-      range.setStart(textNode, start);
-      range.setEnd(textNode, end);
-      ranges.push(range);
-
-      if (!firstRange) {
-        firstRange = range;
-      }
-
-      match = regex.exec(text);
-    }
-  });
-
-  if (ranges.length === 0) {
-    return null;
-  }
-
-  if (typeof CSS !== "undefined" && "highlights" in CSS) {
-    CSS.highlights.set("search-match", new Highlight(...ranges));
-    if (firstRange) {
-      CSS.highlights.set("search-current", new Highlight(firstRange));
-    }
-  }
-
-  return firstRange;
+  return null;
 }
 
 export function SearchHighlight({ children }: { children: ReactNode }) {
@@ -93,7 +57,7 @@ export function SearchHighlight({ children }: { children: ReactNode }) {
     const root = rootRef.current;
     if (!root) return;
 
-    clearCustomHighlights();
+    clearActiveTargets(root);
 
     if (!query.trim()) {
       return;
@@ -103,19 +67,15 @@ export function SearchHighlight({ children }: { children: ReactNode }) {
     let observer: MutationObserver | null = null;
     let timeoutId: number | null = null;
 
-    const attemptHighlight = () => {
+    const attemptFocus = () => {
       if (cancelled || !rootRef.current) return false;
 
-      clearCustomHighlights();
-      const firstRange = highlightQuery(rootRef.current, query);
-      if (!firstRange) return false;
+      clearActiveTargets(rootRef.current);
+      const target = findSearchTarget(rootRef.current, query);
+      if (!target) return false;
 
-      const firstElement =
-        firstRange.startContainer instanceof Element
-          ? firstRange.startContainer
-          : firstRange.startContainer.parentElement;
-
-      firstElement?.scrollIntoView({
+      target.setAttribute("data-search-current", "true");
+      target.scrollIntoView({
         behavior: "smooth",
         block: "center",
       });
@@ -123,11 +83,10 @@ export function SearchHighlight({ children }: { children: ReactNode }) {
       return true;
     };
 
-    const scheduleAttempts = [0, 120, 320];
-    scheduleAttempts.forEach((delay) => {
+    [0, 150, 400].forEach((delay) => {
       window.setTimeout(() => {
         if (cancelled) return;
-        if (attemptHighlight() && observer) {
+        if (attemptFocus() && observer) {
           observer.disconnect();
           observer = null;
         }
@@ -135,7 +94,7 @@ export function SearchHighlight({ children }: { children: ReactNode }) {
     });
 
     observer = new MutationObserver(() => {
-      if (attemptHighlight() && observer) {
+      if (attemptFocus() && observer) {
         observer.disconnect();
         observer = null;
       }
@@ -149,7 +108,6 @@ export function SearchHighlight({ children }: { children: ReactNode }) {
     timeoutId = window.setTimeout(() => {
       if (observer) {
         observer.disconnect();
-        observer = null;
       }
     }, 2000);
 
@@ -161,7 +119,9 @@ export function SearchHighlight({ children }: { children: ReactNode }) {
       if (timeoutId !== null) {
         window.clearTimeout(timeoutId);
       }
-      clearCustomHighlights();
+      if (rootRef.current) {
+        clearActiveTargets(rootRef.current);
+      }
     };
   }, [pathname, query]);
 
