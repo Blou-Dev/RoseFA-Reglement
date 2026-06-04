@@ -84,29 +84,178 @@ const DEFAULT_HOMEPAGE: HomePageContentData = {
   ],
 };
 
-const SAFE_LEXIQUE_BODY = `## Comprendre le vocabulaire du serveur
+const SAFE_LEXIQUE_BODY = `# Lexique RP
 
-Avant de participer a des scenes importantes, il est essentiel de connaitre les expressions les plus courantes du roleplay RoseFA.
+Avant de participer a des scenes importantes, il est essentiel de connaitre les expressions et notions les plus courantes du roleplay sur RoseFA.
 
 <Alert title="Pourquoi ce lexique ?" variant="info">
-Il permet d'eviter les ruptures d'immersion tout en gardant une communication claire lorsque la technique ou le contexte l'impose.
+Ce lexique permet de comprendre les termes utilises sur le serveur et d'eviter les erreurs de roleplay.
 </Alert>
 
 <Accordion
   items={[
-    { title: "Mal de tete", content: "Expression utilisee pour signaler un souci technique, un freeze ou un ralentissement qui perturbe une scene." },
-    { title: "Robespierre", content: "Mot code utilise pour parler d'un administrateur ou d'une intervention staff sans sortir du roleplay." },
-    { title: "Unite X", content: "Designe une personne ou une information que l'on ne souhaite pas nommer precisement dans l'instant." },
-    { title: "Tempete", content: "Annonce roleplay d'un redemarrage ou d'une relance du serveur." },
-    { title: "Papillon", content: "Joueur qui tourne autour d'une scene, observe ou reste en flottement sans se positionner clairement." },
-    { title: "Avoir un chewing-gum", content: "Designe un probleme de micro ou de voix robotisee pendant une interaction vocale." },
-    { title: "Prendre une pastille", content: "Signifie qu'un joueur doit changer de canal vocal ou corriger un souci audio." },
-    { title: "GoPro / DashCam / Lunette violette", content: "Indique qu'une scene est potentiellement captee ou exploitable selon les regles en vigueur du serveur." },
-    { title: "Faire une sieste", content: "Annonce une deco/reco rapide pour resoudre un bug ou une desynchronisation." },
-    { title: "Aller dormir", content: "Annonce une deconnexion plus longue ou une fin de session." },
-    { title: "Parler chinois", content: "Utilise quand un message est incomprehensible, coupe ou inaudible." },
+    {
+      title: "Powergaming",
+      content: "Le Powergaming consiste a realiser des actions impossibles ou irrealistes en forcant volontairement les limites du jeu afin d'obtenir un avantage RP."
+    },
+    {
+      title: "Metagaming",
+      content: "Le Metagaming consiste a utiliser des informations obtenues hors RP (Discord, stream, vocal externe, etc.) dans une scene RP."
+    },
+    {
+      title: "Carjacking",
+      content: "Le fait de voler un vehicule occupe ou non sans l'accord de son proprietaire dans un contexte RP coherent."
+    },
+    {
+      title: "Mass RP",
+      content: "Le Mass RP consiste a prendre en compte la presence logique de personnes non visibles autour de vous (habitants, policiers, employes, citoyens, etc.)."
+    },
+    {
+      title: "Fear RP",
+      content: "Le Fear RP represente l'instinct de survie de votre personnage. Celui-ci doit craindre la mort, les blessures, la prison et les consequences de ses actes."
+    },
+    {
+      title: "Fear Groupe Illegal",
+      content: "Le Fear Groupe Illegal s'applique aux interactions entre groupes illegaux. Cependant, sur les points chauds, celui-ci est partiellement assoupli afin de preserver les possibilites de RP. Le simple surnombre ne garantit pas automatiquement le controle d'une scene. Chaque groupe reste libre d'assumer les consequences RP de ses decisions. Les joueurs ne doivent cependant jamais agir comme des super-heros."
+    },
+    {
+      title: "No Fear RP",
+      content: "Le fait d'ignorer volontairement un danger evident ou une menace credible sans raison RP valable."
+    },
+    {
+      title: "Chicken Run",
+      content: "Courir dans tous les sens afin d'eviter artificiellement les tirs ou les coups est interdit."
+    },
+    {
+      title: "Drive-By",
+      content: "Le fait de tirer depuis un vehicule. Le Drive-By est interdit sur RoseFA. Seules certaines exceptions concernant les Forces de l'Ordre peuvent etre prevues dans les reglements specifiques."
+    },
+    {
+      title: "Copbait",
+      content: "Le fait de provoquer volontairement les Forces de l'Ordre dans le seul but de declencher une poursuite ou une intervention."
+    },
+    {
+      title: "Gangbait",
+      content: "Le fait de provoquer volontairement un groupe illegal dans le seul but de declencher un conflit."
+    },
+    {
+      title: "Safe Zone",
+      content: "Zone dans laquelle les actions hostiles, agressions et activites illegales sont interdites."
+    },
+    {
+      title: "FreeKill / FreePunch",
+      content: "Le fait de tuer ou frapper un joueur sans raison RP valable."
+    },
+    {
+      title: "FreeLoot",
+      content: "Le fait de voler les biens d'un joueur sans raison RP coherente ou sans scene prealable."
+    },
+    {
+      title: "Pain RP",
+      content: "Le fait de jouer les blessures, douleurs et consequences physiques subies par votre personnage."
+    },
+    {
+      title: "Force RP",
+      content: "Le fait d'imposer son RP a un autre joueur sans lui laisser la possibilite de repondre ou d'agir de maniere coherente."
+    },
+    {
+      title: "Win RP",
+      content: "Le fait de chercher uniquement a gagner une scene sans prendre en compte la coherence RP ou le plaisir de jeu des autres participants."
+    },
+    {
+      title: "Coherence RP",
+      content: "Le fait de jouer un personnage coherent avec son histoire, son environnement, son metier et ses connaissances."
+    },
+    {
+      title: "Carkill",
+      content: "Le fait d'ecraser volontairement un joueur avec un vehicule sans raison RP valable."
+    },
+    {
+      title: "Revenge Kill",
+      content: "Le fait de revenir sur une scene afin de se venger d'une personne responsable de votre mort ou de votre coma."
+    },
+    {
+      title: "Coma",
+      content: "Perte de conscience temporaire du personnage. Les regles de NLR s'appliquent."
+    },
+    {
+      title: "Mort RP",
+      content: "Suppression definitive d'un personnage validee selon le reglement Mort RP du serveur."
+    },
+    {
+      title: "/me",
+      content: "Commande permettant de decrire une action ou un etat que le jeu ne peut pas representer visuellement."
+    },
+    {
+      title: "Mix",
+      content: "Le fait de melanger des informations RP et HRP."
+    },
+    {
+      title: "HRP Vocal",
+      content: "Le fait de parler hors personnage durant une scene RP."
+    },
+    {
+      title: "Insinuation HRP",
+      content: "Le fait de faire comprendre a un joueur qu'il commet une erreur de reglement ou de gameplay directement en scene RP."
+    },
+    {
+      title: "Bunny Hop",
+      content: "Le fait de sauter continuellement afin d'aller plus vite. Cette pratique est interdite."
+    },
+    {
+      title: "UseBug",
+      content: "L'exploitation volontaire d'un bug afin d'obtenir un avantage RP ou gameplay."
+    },
+    {
+      title: "Raccourci RP",
+      content: "Le fait de tirer des conclusions RP sans element coherent permettant de les justifier."
+    },
+    {
+      title: "Fairplay",
+      content: "Le fait de privilegier la qualite des scenes, le plaisir de jeu et la coherence plutot que la victoire a tout prix."
+    },
+    {
+      title: "Mal aux yeux",
+      content: "Expression RP utilisee pour signaler un probleme graphique ou de FPS."
+    },
+    {
+      title: "Mal de tete",
+      content: "Expression RP utilisee pour signaler un crash ou un probleme technique."
+    },
+    {
+      title: "Chewing-Gum",
+      content: "Expression utilisee lorsqu'un joueur teleporte ou rencontre un probleme de synchronisation."
+    },
+    {
+      title: "Tempete",
+      content: "Annonce RP d'un redemarrage du serveur."
+    },
+    {
+      title: "Prendre une pastille",
+      content: "Expression utilisee pour signaler un probleme de microphone."
+    },
+    {
+      title: "DashCam / BodyCam / GoPro",
+      content: "Expression indiquant qu'un enregistrement RP est en cours selon les regles du serveur."
+    },
+    {
+      title: "Unite X",
+      content: "Expression utilisee pour justifier un retour hopital ou un deplacement administratif."
+    },
+    {
+      title: "Faire une sieste",
+      content: "Expression RP utilisee lorsqu'un joueur se deconnecte puis se reconnecte."
+    },
+    {
+      title: "Papillon / Gouvernement",
+      content: "Expression utilisee pour demander l'intervention d'un membre du Staff. Son utilisation abusive est interdite."
+    }
   ]}
-/>`;
+/>
+
+<Callout>
+L'ignorance des termes presents dans ce lexique ne constitue pas une excuse en cas de non-respect du reglement.
+</Callout>`;
 
 function normalizePublicBody({
   categorySlug,
