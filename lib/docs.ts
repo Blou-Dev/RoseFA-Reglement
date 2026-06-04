@@ -1,6 +1,6 @@
-import { cache } from "react";
 import type { Category, HomePageContent, HomePageLink, Page } from "@prisma/client";
 import { HomePageSectionType, PageStatus } from "@prisma/client";
+import { unstable_noStore as noStore } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import type { AdminWriterAccount, HomePageContentData, PublicCategory, PublicPage, SearchItem } from "@/lib/types";
 
@@ -309,7 +309,8 @@ function mapHomePageContent(
   };
 }
 
-export const getPublicCategories = cache(async (): Promise<PublicCategory[]> => {
+export async function getPublicCategories(): Promise<PublicCategory[]> {
+  noStore();
   const categories = await prisma.category.findMany({
     orderBy: [{ order: "asc" }, { title: "asc" }],
     include: {
@@ -329,9 +330,10 @@ export const getPublicCategories = cache(async (): Promise<PublicCategory[]> => 
       })),
     }))
     .filter((category) => category.pages.length > 0);
-});
+}
 
-export const getPublicPageBySlug = cache(async (slug: string[]): Promise<PublicPage | null> => {
+export async function getPublicPageBySlug(slug: string[]): Promise<PublicPage | null> {
+  noStore();
   if (slug.length !== 2) return null;
   const [categorySlug, pageSlug] = slug;
 
@@ -361,9 +363,10 @@ export const getPublicPageBySlug = cache(async (slug: string[]): Promise<PublicP
     body: normalizedBody,
     href: `/docs/${page.category.slug}/${page.slug}`,
   };
-});
+}
 
-export const getPublishedPageParams = cache(async () => {
+export async function getPublishedPageParams() {
+  noStore();
   const pages = await prisma.page.findMany({
     where: { status: PageStatus.PUBLISHED },
     select: {
@@ -379,9 +382,10 @@ export const getPublishedPageParams = cache(async () => {
   return pages.map((page) => ({
     slug: [page.category.slug, page.slug],
   }));
-});
+}
 
-export const getSearchIndex = cache(async (): Promise<SearchItem[]> => {
+export async function getSearchIndex(): Promise<SearchItem[]> {
+  noStore();
   const pages = await prisma.page.findMany({
     where: { status: PageStatus.PUBLISHED },
     orderBy: [{ order: "asc" }, { title: "asc" }],
@@ -404,9 +408,10 @@ export const getSearchIndex = cache(async (): Promise<SearchItem[]> => {
       .replace(/\s+/g, " ")
       .trim(),
   }));
-});
+}
 
-export const getPublicHomePageContent = cache(async (): Promise<HomePageContentData> => {
+export async function getPublicHomePageContent(): Promise<HomePageContentData> {
+  noStore();
   const homepage = await prisma.homePageContent.findUnique({
     where: { id: "homepage" },
     include: {
@@ -417,7 +422,7 @@ export const getPublicHomePageContent = cache(async (): Promise<HomePageContentD
   });
 
   return mapHomePageContent(homepage);
-});
+}
 
 export async function getAdminCategories(): Promise<Array<Category & { pages: Page[] }>> {
   return prisma.category.findMany({
