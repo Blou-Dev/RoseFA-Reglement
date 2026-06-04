@@ -18,8 +18,28 @@ function isAccordionItem(value: unknown): value is AccordionItemType {
   );
 }
 
-export function Accordion({ items }: { items?: AccordionItemType[] }) {
-  const safeItems = Array.isArray(items) ? items.filter(isAccordionItem) : [];
+function parseEncodedItems(itemsEncoded?: string) {
+  if (!itemsEncoded) return [];
+
+  try {
+    const decoded = decodeURIComponent(itemsEncoded);
+    const parsed = JSON.parse(decoded) as unknown;
+    return Array.isArray(parsed) ? parsed.filter(isAccordionItem) : [];
+  } catch {
+    return [];
+  }
+}
+
+export function Accordion({
+  items,
+  itemsEncoded,
+}: {
+  items?: AccordionItemType[];
+  itemsEncoded?: string;
+}) {
+  const safeItems = Array.isArray(items) && items.length > 0
+    ? items.filter(isAccordionItem)
+    : parseEncodedItems(itemsEncoded);
 
   if (safeItems.length === 0) {
     return null;

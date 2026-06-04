@@ -1,3 +1,5 @@
+import { normalizeBodyForMdx } from "@/lib/mdx-body";
+
 function escapeHtml(value: string) {
   return value
     .replaceAll("&", "&amp;")
@@ -20,7 +22,8 @@ function renderInlineFormatting(value: string) {
 }
 
 export function renderSimpleEditorPreview(source: string) {
-  const lines = source.replace(/\r\n/g, "\n").split("\n");
+  const normalizedSource = normalizeBodyForMdx(source);
+  const lines = normalizedSource.replace(/\r\n/g, "\n").split("\n");
   const html: string[] = [];
   let paragraphLines: string[] = [];
   let listItems: string[] = [];
@@ -52,6 +55,33 @@ export function renderSimpleEditorPreview(source: string) {
       flushList();
       html.push("<hr />");
       continue;
+    }
+
+    if (trimmed.startsWith("<Accordion ") && trimmed.includes('itemsEncoded="')) {
+      flushParagraph();
+      flushList();
+      const match = trimmed.match(/itemsEncoded="([^"]+)"/);
+      if (match) {
+        try {
+          const decoded = decodeURIComponent(match[1]);
+          const items = JSON.parse(decoded) as Array<{ title?: string; content?: string }>;
+          const safeItems = Array.isArray(items)
+            ? items.filter((item) => typeof item?.title === "string" && typeof item?.content === "string")
+            : [];
+
+          html.push(
+            `<div class="preview-accordion">${safeItems
+              .map(
+                (item) =>
+                  `<div class="preview-accordion-item"><div class="preview-accordion-title">${renderInlineFormatting(item.title!)}</div><div class="preview-accordion-content">${renderInlineFormatting(item.content!)}</div></div>`,
+              )
+              .join("")}</div>`,
+          );
+          continue;
+        } catch {
+          // Ignore and fall through to plain text rendering.
+        }
+      }
     }
 
     if (trimmed.startsWith("- ") || trimmed.startsWith("* ")) {

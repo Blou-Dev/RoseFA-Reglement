@@ -6,6 +6,7 @@ import { Banner } from "@/components/banner";
 import { mdxComponents } from "@/components/mdx/mdx-components";
 import { SearchHighlight } from "@/components/search-highlight";
 import { getPublicPageBySlug, getSafeLexiqueBody } from "@/lib/docs";
+import { normalizeBodyForMdx } from "@/lib/mdx-body";
 
 export const dynamic = "force-dynamic";
 
@@ -42,7 +43,7 @@ export default async function DocPage({
 
   async function compileBody(source: string) {
     return compileMDX({
-      source,
+      source: normalizeBodyForMdx(source),
       components: mdxComponents,
       options: {
         parseFrontmatter: false,
