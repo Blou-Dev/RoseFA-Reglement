@@ -257,27 +257,8 @@ Ce lexique permet de comprendre les termes utilises sur le serveur et d'eviter l
 L'ignorance des termes presents dans ce lexique ne constitue pas une excuse en cas de non-respect du reglement.
 </Callout>`;
 
-function normalizePublicBody({
-  categorySlug,
-  pageSlug,
-  body,
-}: {
-  categorySlug: string;
-  pageSlug: string;
-  body: string;
-}) {
-  if (
-    categorySlug === "reglement-rosefa" &&
-    pageSlug === "lexique" &&
-    (body.includes("Avant de participer Ã") ||
-      body.includes("rÃ©aliser des actions irrÃ©alistes") ||
-      body.includes("diffÃ©rentes notions RP utilisÃ©es") ||
-      body.includes("scÃ¨nes cohÃ©rentes, immersives et agrÃ©ables"))
-  ) {
-    return SAFE_LEXIQUE_BODY;
-  }
-
-  return body;
+export function getSafeLexiqueBody() {
+  return SAFE_LEXIQUE_BODY;
 }
 
 function mapHomePageContent(
@@ -352,15 +333,9 @@ export async function getPublicPageBySlug(slug: string[]): Promise<PublicPage | 
 
   if (!page) return null;
 
-  const normalizedBody = normalizePublicBody({
-    categorySlug: page.category.slug,
-    pageSlug: page.slug,
-    body: page.body,
-  });
-
   return {
     ...page,
-    body: normalizedBody,
+    body: page.body,
     href: `/docs/${page.category.slug}/${page.slug}`,
   };
 }
@@ -399,11 +374,7 @@ export async function getSearchIndex(): Promise<SearchItem[]> {
     description: page.description,
     href: `/docs/${page.category.slug}/${page.slug}`,
     section: page.category.title,
-    content: normalizePublicBody({
-      categorySlug: page.category.slug,
-      pageSlug: page.slug,
-      body: page.body,
-    })
+    content: page.body
       .replace(/[#>*`-]/g, " ")
       .replace(/\s+/g, " ")
       .trim(),

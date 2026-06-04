@@ -5,7 +5,7 @@ import remarkGfm from "remark-gfm";
 import { Banner } from "@/components/banner";
 import { mdxComponents } from "@/components/mdx/mdx-components";
 import { SearchHighlight } from "@/components/search-highlight";
-import { getPublicPageBySlug } from "@/lib/docs";
+import { getPublicPageBySlug, getSafeLexiqueBody } from "@/lib/docs";
 
 export const dynamic = "force-dynamic";
 
@@ -40,16 +40,32 @@ export default async function DocPage({
 
   if (!page) notFound();
 
-  const { content } = await compileMDX({
-    source: page.body,
-    components: mdxComponents,
-    options: {
-      parseFrontmatter: false,
-      mdxOptions: {
-        remarkPlugins: [remarkGfm, remarkBreaks],
+  async function compileBody(source: string) {
+    return compileMDX({
+      source,
+      components: mdxComponents,
+      options: {
+        parseFrontmatter: false,
+        mdxOptions: {
+          remarkPlugins: [remarkGfm, remarkBreaks],
+        },
       },
-    },
-  });
+    });
+  }
+
+  let compiled;
+
+  try {
+    compiled = await compileBody(page.body);
+  } catch (error) {
+    const isLexiquePage = page.category.slug === "reglement-rosefa" && page.slug === "lexique";
+
+    if (!isLexiquePage) {
+      throw error;
+    }
+
+    compiled = await compileBody(getSafeLexiqueBody());
+  }
 
   return (
     <div className="space-y-8">
@@ -63,7 +79,7 @@ export default async function DocPage({
             Mis a jour: {new Intl.DateTimeFormat("fr-FR").format(page.updatedAt)}
           </span>
         </div>
-        <SearchHighlight>{content}</SearchHighlight>
+        <SearchHighlight>{compiled.content}</SearchHighlight>
       </article>
     </div>
   );
