@@ -19,8 +19,8 @@ export function DocShell({
       <div className="mx-auto flex max-w-[var(--page-max-width)] xl:px-4">
         <Sidebar categories={safeCategories} />
         <main className="min-w-0 flex-1">
-          <div className="mx-auto max-w-[1040px] px-4 py-6 md:px-6 md:py-7 xl:px-8">{children}</div>
-          <div className="mx-auto max-w-[1040px] px-4 pb-10 md:px-6 xl:px-8">
+          <div className="mx-auto max-w-[1040px] px-3 py-4 sm:px-4 sm:py-5 md:px-6 md:py-7 xl:px-8">{children}</div>
+          <div className="mx-auto max-w-[1040px] px-3 pb-8 sm:px-4 md:px-6 xl:px-8">
             <FooterBadge />
           </div>
         </main>

@@ -154,8 +154,8 @@ export function SearchBar() {
 
   return (
     <div ref={wrapperRef} className="relative w-full max-w-2xl">
-      <label className="flex h-13 items-center gap-3 rounded-full border border-white/10 bg-black/40 px-4 text-sm text-white/60 shadow-[0_10px_40px_rgba(0,0,0,0.2)] backdrop-blur">
-        <Search className="h-4 w-4 text-rose-300" />
+      <label className="flex h-12 items-center gap-3 rounded-full border border-white/10 bg-black/50 px-4 text-sm text-white/60 backdrop-blur md:h-13">
+        <Search className="h-4 w-4 shrink-0 text-rose-300" />
         <input
           ref={inputRef}
           value={query}
@@ -166,15 +166,15 @@ export function SearchBar() {
             setOpen(true);
           }}
           placeholder="Rechercher un reglement, un guide, une notion..."
-          className="h-full flex-1 bg-transparent outline-none placeholder:text-white/32"
+          className="h-full min-w-0 flex-1 bg-transparent text-[15px] outline-none placeholder:text-white/32"
         />
         <span className="hidden rounded-full border border-white/10 px-2 py-1 text-[11px] text-white/45 md:inline-flex">Ctrl K</span>
       </label>
 
       {open ? (
-        <div className="surface-panel absolute left-0 right-0 top-[calc(100%+0.75rem)] z-40 overflow-hidden rounded-[1rem] border border-white/10 bg-[#0c0c12]/95">
+        <div className="surface-panel absolute left-0 right-0 top-[calc(100%+0.55rem)] z-40 overflow-hidden rounded-[1rem] border border-white/10 bg-[#0c0c12]/95 md:top-[calc(100%+0.75rem)]">
           {hasResults ? (
-            <div className="max-h-[24rem] overflow-y-auto p-2">
+            <div className="max-h-[min(60dvh,24rem)] overflow-y-auto p-2">
               {items.map((item, index) => (
                 <button
                   key={`${item.href}-${item.title}`}
@@ -187,7 +187,7 @@ export function SearchBar() {
                 >
                   <div className="text-xs uppercase tracking-[0.18em] text-rose-300/80">{item.section}</div>
                   <div className="mt-1 text-sm font-semibold text-white">{item.title}</div>
-                  <div className="mt-1 line-clamp-2 text-sm text-white/55">{item.description}</div>
+                  <div className="mt-1 line-clamp-2 text-sm leading-6 text-white/55">{item.description}</div>
                 </button>
               ))}
             </div>
